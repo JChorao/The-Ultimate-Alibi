@@ -4,6 +4,7 @@ using UnityEngine.InputSystem; // Obrigatório para o Novo Input System
 public class PlayerInteraction : MonoBehaviour
 {
     [Header("Interaction Settings")]
+    [Tooltip("Distância máxima a que o Jorge consegue interagir com algo.")]
     public float interactionDistance = 3f;
     
     [Header("Input Actions")]
@@ -27,6 +28,9 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
+        // Para evitar erros, só corre o código se a câmara estiver atribuída
+        if (playerCamera == null) return;
+
         // Cria um raio a partir do centro do ecrã (câmara)
         Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
         RaycastHit hit;
@@ -39,7 +43,7 @@ public class PlayerInteraction : MonoBehaviour
 
             if (interactable != null)
             {
-                // Verifica se a tecla configurada foi pressionada EXATAMENTE nesta frame (equivalente ao GetKeyDown)
+                // Verifica se a tecla configurada foi pressionada EXATAMENTE nesta frame
                 if (interactAction.WasPressedThisFrame())
                 {
                     interactable.Interact();

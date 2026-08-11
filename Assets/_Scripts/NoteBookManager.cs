@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class NotebookManager : MonoBehaviour
 {
-    // A instância global do caderno acessível de qualquer lado
+    // A instância global do caderno, acessível de qualquer lado
     public static NotebookManager Instance;
 
     [Header("Pistas Recolhidas")]
@@ -22,10 +22,10 @@ public class NotebookManager : MonoBehaviour
         }
     }
 
-    // Função que será chamada quando o Jorge apanhar uma pista
+    // Função chamada quando o Jorge apanha uma pista
     public void AddClue(Clue newClue)
     {
-        // Verifica se ainda não temos esta pista
+        // Verifica se o Jorge ainda não tem esta pista
         if (!collectedClues.Contains(newClue))
         {
             collectedClues.Add(newClue);
