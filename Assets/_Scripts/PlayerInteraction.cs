@@ -1,13 +1,29 @@
 using UnityEngine;
+using UnityEngine.InputSystem; // Obrigatório para o Novo Input System
 
 public class PlayerInteraction : MonoBehaviour
 {
     [Header("Interaction Settings")]
     public float interactionDistance = 3f;
-    public KeyCode interactKey = KeyCode.E;
+    
+    [Header("Input Actions")]
+    [Tooltip("Configura a tecla de interação (ex: Tecla E) no Inspector.")]
+    public InputAction interactAction;
     
     [Tooltip("Coloca aqui a câmara do jogador para o Raycast saber para onde olhar.")]
     public Camera playerCamera;
+
+    private void OnEnable()
+    {
+        // Ativa a ação de input quando o objeto está ativo
+        interactAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        // Desativa a ação para poupar memória quando não é necessária
+        interactAction.Disable();
+    }
 
     private void Update()
     {
@@ -23,8 +39,8 @@ public class PlayerInteraction : MonoBehaviour
 
             if (interactable != null)
             {
-                // Se o jogador pressionar a tecla de interação (E)
-                if (Input.GetKeyDown(interactKey))
+                // Verifica se a tecla configurada foi pressionada EXATAMENTE nesta frame (equivalente ao GetKeyDown)
+                if (interactAction.WasPressedThisFrame())
                 {
                     interactable.Interact();
                 }
