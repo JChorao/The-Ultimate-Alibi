@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3720e14d67a06546b656549f8db1193, type: 3}
   m_Name: ProvaTest
   m_EditorClassIdentifier: Assembly-CSharp::Clue
-  clueName: 
-  description: 
+  type: 0
+  clueName: "Cart\xE3o do SS"
+  description: Acho que o Nate Iggens esta demaisado preocupado com o caso
