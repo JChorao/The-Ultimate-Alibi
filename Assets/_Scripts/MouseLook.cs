@@ -34,6 +34,13 @@ public class MouseLook : MonoBehaviour
 
     private void Update()
     {
+        // --- A LINHA MÁGICA QUE RESOLVE O TEU PROBLEMA ---
+        // Se o rato não estiver trancado (porque abriste o Caderno), pára de correr o código de rodar a câmara.
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            return;
+        }
+
         // Lê o movimento do rato (Delta)
         Vector2 lookInput = lookAction.ReadValue<Vector2>();
 

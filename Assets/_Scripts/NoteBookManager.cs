@@ -3,15 +3,18 @@ using UnityEngine;
 
 public class NotebookManager : MonoBehaviour
 {
-    // A instância global do caderno, acessível de qualquer lado
     public static NotebookManager Instance;
 
-    [Header("Pistas Recolhidas")]
-    public List<Clue> collectedClues = new List<Clue>();
+    [Header("Dados do Detetive")]
+    public List<Clue> collectedSecrets = new List<Clue>();
+    public List<Clue> collectedItems = new List<Clue>();
+
+    [Header("Notas do Detetive")]
+    [TextArea(5, 10)]
+    public string playerNotes = ""; 
 
     private void Awake()
     {
-        // Garante que só existe um Gestor de Caderno na cena inteira
         if (Instance == null)
         {
             Instance = this;
@@ -22,18 +25,24 @@ public class NotebookManager : MonoBehaviour
         }
     }
 
-    // Função chamada quando o Jorge apanha uma pista
     public void AddClue(Clue newClue)
     {
-        // Verifica se o Jorge ainda não tem esta pista
-        if (!collectedClues.Contains(newClue))
+        // Separa as pistas para a lista correta dependendo do tipo
+        if (newClue.type == ClueType.Segredo)
         {
-            collectedClues.Add(newClue);
-            Debug.Log("Pista adicionada ao caderno: " + newClue.clueName);
+            if (!collectedSecrets.Contains(newClue))
+            {
+                collectedSecrets.Add(newClue);
+                Debug.Log("Segredo adicionado: " + newClue.clueName);
+            }
         }
-        else
+        else if (newClue.type == ClueType.ItemFisico)
         {
-            Debug.Log("O Jorge já registou esta pista!");
+            if (!collectedItems.Contains(newClue))
+            {
+                collectedItems.Add(newClue);
+                Debug.Log("Item adicionado ao inventário: " + newClue.clueName);
+            }
         }
     }
 }
