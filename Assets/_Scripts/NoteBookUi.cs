@@ -7,16 +7,22 @@ public class NotebookUI : MonoBehaviour
     [Header("Estrutura do Caderno")]
     public GameObject notebookPanel;
     public GameObject secretsPage;
-    public GameObject inventoryPage; // NOVA PÁGINA
+    public GameObject inventoryPage;
     public GameObject notesPage;
 
-    [Header("Elementos - Segredos")]
-    public TextMeshProUGUI secretNameText;
-    public TextMeshProUGUI secretDescriptionText;
+    [Header("Elementos - Detalhes da Pista (Direita)")]
+    [Tooltip("O título do lado direito que muda quando clicas num botão.")]
+    public TextMeshProUGUI detailNameText;
+    [Tooltip("A descrição do lado direito que muda quando clicas num botão.")]
+    public TextMeshProUGUI detailDescriptionText;
 
-    [Header("Elementos - Inventário")]
-    public TextMeshProUGUI itemNameText;
-    public TextMeshProUGUI itemDescriptionText;
+    [Header("Elementos - Grelha (Esquerda)")]
+    [Tooltip("A 'caixa' vazia onde vão aparecer os botões dos Segredos.")]
+    public Transform secretsGridParent;
+    [Tooltip("A 'caixa' vazia onde vão aparecer os botões do Inventário.")]
+    public Transform inventoryGridParent;
+    [Tooltip("Arrasta o prefab do botão para aqui.")]
+    public GameObject clueSlotPrefab;
 
     [Header("Elementos - Texto Livre")]
     public TMP_InputField notesInputField;
@@ -24,8 +30,6 @@ public class NotebookUI : MonoBehaviour
     [Header("Input Actions")]
     public InputAction toggleNotebookAction;
 
-    private int currentSecretIndex = 0;
-    private int currentItemIndex = 0;
     private bool isOpen = false;
 
     private void OnEnable()
@@ -85,7 +89,7 @@ public class NotebookUI : MonoBehaviour
         secretsPage.SetActive(true);
         inventoryPage.SetActive(false);
         notesPage.SetActive(false);
-        UpdateSecretsUI();
+        PopulateGrid(NotebookManager.Instance.collectedSecrets, secretsGridParent);
     }
 
     public void OpenInventoryPage()
@@ -93,7 +97,7 @@ public class NotebookUI : MonoBehaviour
         secretsPage.SetActive(false);
         inventoryPage.SetActive(true);
         notesPage.SetActive(false);
-        UpdateInventoryUI();
+        PopulateGrid(NotebookManager.Instance.collectedItems, inventoryGridParent);
     }
 
     public void OpenNotesPage()
@@ -103,68 +107,48 @@ public class NotebookUI : MonoBehaviour
         notesPage.SetActive(true);
     }
 
-    // --- SISTEMA DE DADOS (SEGREDOS) ---
+    // --- SISTEMA DE GRELHA AUTOMÁTICA ---
 
-    public void NextSecret()
+    private void PopulateGrid(System.Collections.Generic.List<Clue> clues, Transform gridParent)
     {
-        if (NotebookManager.Instance.collectedSecrets.Count == 0) return;
-        currentSecretIndex++;
-        if (currentSecretIndex >= NotebookManager.Instance.collectedSecrets.Count) currentSecretIndex = 0; 
-        UpdateSecretsUI();
-    }
-
-    public void PreviousSecret()
-    {
-        if (NotebookManager.Instance.collectedSecrets.Count == 0) return;
-        currentSecretIndex--;
-        if (currentSecretIndex < 0) currentSecretIndex = NotebookManager.Instance.collectedSecrets.Count - 1; 
-        UpdateSecretsUI();
-    }
-
-    private void UpdateSecretsUI()
-    {
-        if (NotebookManager.Instance.collectedSecrets.Count == 0)
+        // 1. Destrói os botões antigos para não duplicar
+        foreach (Transform child in gridParent)
         {
-            secretNameText.text = "Nenhum Segredo";
-            secretDescriptionText.text = "Ainda não descobri os segredos de ninguém...";
-            return;
+            Destroy(child.gameObject);
         }
 
-        Clue currentClue = NotebookManager.Instance.collectedSecrets[currentSecretIndex];
-        secretNameText.text = currentClue.clueName;
-        secretDescriptionText.text = currentClue.description;
-    }
+        // 2. Limpa o ecrã da direita
+        detailNameText.text = "Selecione um item";
+        detailDescriptionText.text = "";
 
-    // --- SISTEMA DE DADOS (INVENTÁRIO) ---
-
-    public void NextItem()
-    {
-        if (NotebookManager.Instance.collectedItems.Count == 0) return;
-        currentItemIndex++;
-        if (currentItemIndex >= NotebookManager.Instance.collectedItems.Count) currentItemIndex = 0; 
-        UpdateInventoryUI();
-    }
-
-    public void PreviousItem()
-    {
-        if (NotebookManager.Instance.collectedItems.Count == 0) return;
-        currentItemIndex--;
-        if (currentItemIndex < 0) currentItemIndex = NotebookManager.Instance.collectedItems.Count - 1; 
-        UpdateInventoryUI();
-    }
-
-    private void UpdateInventoryUI()
-    {
-        if (NotebookManager.Instance.collectedItems.Count == 0)
+        // 3. Cria os novos botões
+        if (clues.Count > 0)
         {
-            itemNameText.text = "Inventário Vazio";
-            itemDescriptionText.text = "Ainda não recolhi nenhuma prova física.";
-            return;
-        }
+            foreach (Clue clue in clues)
+            {
+                // Cria um botão invisível do prefab e põe-no dentro da grelha
+                GameObject newSlot = Instantiate(clueSlotPrefab, gridParent);
+                
+                // Configura o texto e os dados desse botão
+                ClueSlotUI slotUI = newSlot.GetComponent<ClueSlotUI>();
+                if (slotUI != null)
+                {
+                    slotUI.Setup(clue, this);
+                }
+            }
 
-        Clue currentClue = NotebookManager.Instance.collectedItems[currentItemIndex];
-        itemNameText.text = currentClue.clueName;
-        itemDescriptionText.text = currentClue.description;
+            // Seleciona automaticamente o primeiro item da lista para não ficar vazio
+            ShowClueDetails(clues[0]);
+        }
+    }
+
+    // --- SISTEMA DE DETALHES (LADO DIREITO) ---
+
+    // Esta função é chamada pelos botões da grelha quando clicas neles
+    public void ShowClueDetails(Clue clueToShow)
+    {
+        detailNameText.text = clueToShow.clueName;
+        detailDescriptionText.text = clueToShow.description;
     }
 
     // --- SISTEMA DE TEXTO LIVRE ---
