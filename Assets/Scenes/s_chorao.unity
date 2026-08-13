@@ -2676,8 +2676,10 @@ MonoBehaviour:
   secretsPage: {fileID: 2083040189}
   inventoryPage: {fileID: 1888066863}
   notesPage: {fileID: 472458419}
-  detailNameText: {fileID: 1254725005}
-  detailDescriptionText: {fileID: 1561847839}
+  secretDetailNameText: {fileID: 1254725005}
+  secretDetailDescText: {fileID: 1561847839}
+  inventoryDetailNameText: {fileID: 1127361022}
+  inventoryDetailDescText: {fileID: 2097477923}
   secretsGridParent: {fileID: 850738696}
   inventoryGridParent: {fileID: 379678911}
   clueSlotPrefab: {fileID: 601045692}
